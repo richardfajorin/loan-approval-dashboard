@@ -155,8 +155,12 @@ def train_and_save(verbose: bool = True) -> dict:
     imp = pd.DataFrame(
         {"Feature": feature_columns, "Importance": model.feature_importances_}
     )
+    # Light-weight on purpose (single process, 2,000-row sample) so the app can
+    # retrain on small free servers without running out of memory.
+    sample = X_test.sample(n=min(2000, len(X_test)), random_state=RANDOM_STATE)
     perm = permutation_importance(
-        model, X_test, y_test, n_repeats=5, random_state=RANDOM_STATE, n_jobs=-1
+        model, sample, y_test.loc[sample.index],
+        n_repeats=3, random_state=RANDOM_STATE, n_jobs=1,
     )
     imp["Permutation Importance"] = perm.importances_mean
     imp["Permutation Std"] = perm.importances_std
