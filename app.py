@@ -112,10 +112,11 @@ def page_dashboard() -> None:
 
     c = st.columns(5)
     c[0].metric("Records analysed", f"{len(data):,}")
-    c[1].metric("Model accuracy", f"{m['accuracy']:.2%}")
-    c[2].metric("Precision (Approved)", f"{m['precision_approved']:.2f}")
-    c[3].metric("Recall (Approved)", f"{m['recall_approved']:.2f}")
-    c[4].metric("F1 (Approved)", f"{m['f1_approved']:.2f}")
+    c[1].metric("Accuracy", f"{m['accuracy']:.2%}")
+    c[2].metric("Precision", f"{m['precision_approved']:.2f}")
+    c[3].metric("Recall", f"{m['recall_approved']:.2f}")
+    c[4].metric("F1-score", f"{m['f1_approved']:.2f}")
+    st.caption("Precision, recall and F1 are for the Approved class, measured on the 20% test set.")
 
     left, right = st.columns([1, 1.4])
     with left:
@@ -127,14 +128,14 @@ def page_dashboard() -> None:
         fig.update_traces(textinfo="label+percent+value")
         st.plotly_chart(style(fig), width="stretch")
     with right:
-        score_bins = pd.cut(
-            data["Credit Score"], bins=[0, 579, 669, 739, 799, 850],
-            labels=["<580", "580-669", "670-739", "740-799", "800+"],
+        rate_bins = pd.cut(
+            data["Loan interest Rate"], bins=[0, 8, 10, 12, 14, 16, 100],
+            labels=["<8%", "8-10%", "10-12%", "12-14%", "14-16%", "16%+"],
         )
-        by_score = data.groupby(score_bins, observed=True)[TARGET].mean().reset_index()
-        by_score.columns = ["Credit score band", "Approval rate"]
-        fig = px.bar(by_score, x="Credit score band", y="Approval rate",
-                     title="Approval rate by credit score band", text_auto=".1%",
+        by_rate = data.groupby(rate_bins, observed=True)[TARGET].mean().reset_index()
+        by_rate.columns = ["Interest rate band", "Approval rate"]
+        fig = px.bar(by_rate, x="Interest rate band", y="Approval rate",
+                     title="Approval rate by loan interest rate band", text_auto=".1%",
                      color_discrete_sequence=[APPROVED_COLOR])
         fig.update_yaxes(tickformat=".0%")
         st.plotly_chart(style(fig), width="stretch")
