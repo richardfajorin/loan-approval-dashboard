@@ -1,5 +1,7 @@
 # Loan Agent – Intelligent Loan Approval Prediction Dashboard
 
+https://loan-approval-dashboard-442.streamlit.app/
+
 Streamlit app built on the original `Loan_Agent.ipynb` (Random Forest, `loan_data_new.csv`).
 
 ## Run
